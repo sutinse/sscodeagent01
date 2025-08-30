@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import {
   Container,
   Typography,
@@ -33,6 +33,10 @@ import {
   Notifications as NotificationsIcon,
   Security as SecurityIcon,
 } from '@mui/icons-material';
+import { useUserData } from '../hooks/useUserData';
+import type { UserData, UserSettings } from '../services/userService';
+import { ErrorBoundary } from '../components/ErrorBoundary';
+import { UserProfileSkeleton } from '../components/LoadingComponents';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -56,48 +60,89 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-const User: React.FC = () => {
+// User Profile Content Component - handles the actual user data display
+const UserProfileContent: React.FC = () => {
   const theme = useTheme();
+  const { 
+    userData, 
+    userSettings, 
+    isLoading, 
+    error, 
+    updateUserData, 
+    updateUserSettings 
+  } = useUserData(1);
+
   const [isEditing, setIsEditing] = useState(false);
   const [tabValue, setTabValue] = useState(0);
   const [showSuccess, setShowSuccess] = useState(false);
   
-  const [userInfo, setUserInfo] = useState({
-    name: 'Seppo Sutinen',
-    email: 's.sutinen@cgi.com',
-    phone: '+358407420894',
-    location: 'Helsinki, Finland',
-    role: 'IT-Architect',
-    bio: 'Passionate with AI and any new technologies',
-  });
+  // Local state for editing - initialize from API data
+  const [localUserInfo, setLocalUserInfo] = useState<UserData | null>(null);
+  const [localSettings, setLocalSettings] = useState<UserSettings | null>(null);
 
-  const [settings, setSettings] = useState({
-    emailNotifications: true,
-    pushNotifications: false,
-    twoFactorAuth: true,
-    darkMode: false,
-  });
+  // Update local state when API data changes
+  React.useEffect(() => {
+    if (userData) {
+      setLocalUserInfo(userData);
+    }
+  }, [userData]);
+
+  React.useEffect(() => {
+    if (userSettings) {
+      setLocalSettings(userSettings);
+    }
+  }, [userSettings]);
+
+  // Handle loading state
+  if (isLoading || !localUserInfo || !localSettings) {
+    return <UserProfileSkeleton />;
+  }
+
+  // Handle error state
+  if (error) {
+    return (
+      <Alert severity="error" sx={{ mb: 3 }}>
+        {error}
+      </Alert>
+    );
+  }
 
   const handleEdit = () => {
     setIsEditing(true);
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 3000);
+  const handleSave = async () => {
+    try {
+      if (localUserInfo) {
+        await updateUserData(localUserInfo);
+      }
+      if (localSettings) {
+        await updateUserSettings(localSettings);
+      }
+      setIsEditing(false);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+    } catch (err) {
+      console.error('Failed to save user data:', err);
+    }
   };
 
   const handleCancel = () => {
+    // Reset local state to original API data
+    if (userData) setLocalUserInfo(userData);
+    if (userSettings) setLocalSettings(userSettings);
     setIsEditing(false);
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setUserInfo(prev => ({ ...prev, [field]: value }));
+    setLocalUserInfo(prev => prev ? { ...prev, [field]: value } : null);
   };
 
   const handleSettingChange = (setting: string) => {
-    setSettings(prev => ({ ...prev, [setting]: !prev[setting as keyof typeof prev] }));
+    setLocalSettings(prev => prev ? { 
+      ...prev, 
+      [setting]: !prev[setting as keyof typeof prev] 
+    } : null);
   };
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -137,19 +182,19 @@ const User: React.FC = () => {
                   fontSize: '3rem',
                 }}
               >
-                {userInfo.name.split(' ').map(n => n[0]).join('')}
+                {localUserInfo.name.split(' ').map(n => n[0]).join('')}
               </Avatar>
               
               <Typography variant="h5" gutterBottom>
-                {userInfo.name}
+                {localUserInfo.name}
               </Typography>
               
               <Typography variant="body2" color="text.secondary" gutterBottom>
-                {userInfo.role}
+                {localUserInfo.role}
               </Typography>
               
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                {userInfo.bio}
+                {localUserInfo.bio}
               </Typography>
 
               <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
@@ -194,19 +239,19 @@ const User: React.FC = () => {
                   <ListItemIcon>
                     <EmailIcon />
                   </ListItemIcon>
-                  <ListItemText primary={userInfo.email} />
+                  <ListItemText primary={localUserInfo.email} />
                 </ListItem>
                 <ListItem>
                   <ListItemIcon>
                     <PhoneIcon />
                   </ListItemIcon>
-                  <ListItemText primary={userInfo.phone} />
+                  <ListItemText primary={localUserInfo.phone} />
                 </ListItem>
                 <ListItem>
                   <ListItemIcon>
                     <LocationIcon />
                   </ListItemIcon>
-                  <ListItemText primary={userInfo.location} />
+                  <ListItemText primary={localUserInfo.location} />
                 </ListItem>
               </List>
             </CardContent>
@@ -245,7 +290,7 @@ const User: React.FC = () => {
                 <TextField
                   fullWidth
                   label="Full Name"
-                  value={userInfo.name}
+                  value={localUserInfo.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   disabled={!isEditing}
                   variant="outlined"
@@ -253,7 +298,7 @@ const User: React.FC = () => {
                 <TextField
                   fullWidth
                   label="Email"
-                  value={userInfo.email}
+                  value={localUserInfo.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   disabled={!isEditing}
                   variant="outlined"
@@ -261,7 +306,7 @@ const User: React.FC = () => {
                 <TextField
                   fullWidth
                   label="Phone"
-                  value={userInfo.phone}
+                  value={localUserInfo.phone}
                   onChange={(e) => handleInputChange('phone', e.target.value)}
                   disabled={!isEditing}
                   variant="outlined"
@@ -269,7 +314,7 @@ const User: React.FC = () => {
                 <TextField
                   fullWidth
                   label="Location"
-                  value={userInfo.location}
+                  value={localUserInfo.location}
                   onChange={(e) => handleInputChange('location', e.target.value)}
                   disabled={!isEditing}
                   variant="outlined"
@@ -277,7 +322,7 @@ const User: React.FC = () => {
                 <TextField
                   fullWidth
                   label="Role"
-                  value={userInfo.role}
+                  value={localUserInfo.role}
                   onChange={(e) => handleInputChange('role', e.target.value)}
                   disabled={!isEditing}
                   variant="outlined"
@@ -288,7 +333,7 @@ const User: React.FC = () => {
                   label="Bio"
                   multiline
                   rows={4}
-                  value={userInfo.bio}
+                  value={localUserInfo.bio}
                   onChange={(e) => handleInputChange('bio', e.target.value)}
                   disabled={!isEditing}
                   variant="outlined"
@@ -315,7 +360,7 @@ const User: React.FC = () => {
                     <FormControlLabel
                       control={
                         <Switch
-                          checked={settings.emailNotifications}
+                          checked={localSettings.emailNotifications}
                           onChange={() => handleSettingChange('emailNotifications')}
                         />
                       }
@@ -334,7 +379,7 @@ const User: React.FC = () => {
                     <FormControlLabel
                       control={
                         <Switch
-                          checked={settings.pushNotifications}
+                          checked={localSettings.pushNotifications}
                           onChange={() => handleSettingChange('pushNotifications')}
                         />
                       }
@@ -363,7 +408,7 @@ const User: React.FC = () => {
                     <FormControlLabel
                       control={
                         <Switch
-                          checked={settings.twoFactorAuth}
+                          checked={localSettings.twoFactorAuth}
                           onChange={() => handleSettingChange('twoFactorAuth')}
                         />
                       }
@@ -386,6 +431,29 @@ const User: React.FC = () => {
           </Paper>
         </Box>
       </Box>
+    </Container>
+  );
+};
+
+// Main User component with React 19 best practices (Suspense + ErrorBoundary)
+const User: React.FC = () => {
+  return (
+    <Container maxWidth="lg">
+      {/* Header */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom>
+          User Profile
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Manage your personal information and account settings
+        </Typography>
+      </Box>
+
+      <ErrorBoundary>
+        <Suspense fallback={<UserProfileSkeleton />}>
+          <UserProfileContent />
+        </Suspense>
+      </ErrorBoundary>
     </Container>
   );
 };
