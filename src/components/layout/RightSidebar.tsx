@@ -141,7 +141,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({ open, onClose, variant }) =
             Welcome back!
           </Typography>
           <Typography variant="h6">
-            John Doe
+            Seppo Sutinen
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Administrator
