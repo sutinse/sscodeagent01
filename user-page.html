@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - Seppo Sutinen</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .profile-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .profile-name {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .profile-role {
+            font-size: 1.3em;
+            color: #666;
+            font-weight: 300;
+        }
+        .profile-info {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #555;
+            width: 120px;
+            flex-shrink: 0;
+        }
+        .info-value {
+            color: #333;
+        }
+        .profile-bio {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            font-style: italic;
+            color: #555;
+        }
+        .bio-label {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-card">
+        <div class="profile-header">
+            <h1 class="profile-name">Seppo Sutinen</h1>
+            <p class="profile-role">IT-Architect</p>
+        </div>
+        
+        <div class="profile-info">
+            <div class="info-item">
+                <span class="info-label">Email:</span>
+                <span class="info-value">s.sutinen@cgi.com</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Phone:</span>
+                <span class="info-value">+358407420894</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Location:</span>
+                <span class="info-value">Helsinki, Finland</span>
+            </div>
+        </div>
+
+        <div class="profile-bio">
+            <div class="bio-label">About:</div>
+            <div>Passionate with AI and any new technologies</div>
+        </div>
+    </div>
+
+    <script>
+        // Load user profile data from JSON file
+        fetch('./user-profile.json')
+            .then(response => response.json())
+            .then(data => {
+                console.log('User profile loaded:', data);
+                // Data is already correctly displayed in the HTML
+                // This script could be used for dynamic loading if needed
+            })
+            .catch(error => {
+                console.error('Error loading user profile:', error);
+            });
+    </script>
+</body>
+</html>
