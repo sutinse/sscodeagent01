@@ -63,12 +63,12 @@ const User: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   
   const [userInfo, setUserInfo] = useState({
-    name: 'John Doe',
-    email: 'john.doe@sscodeagent01.com',
-    phone: '+1 (555) 123-4567',
-    location: 'San Francisco, CA',
-    role: 'Software Developer',
-    bio: 'Passionate developer with expertise in modern web technologies.',
+    name: 'Seppo Sutinen',
+    email: 's.sutinen@cgi.com',
+    phone: '+358407420894',
+    location: 'Helsinki, Finland',
+    role: 'IT-Architect',
+    bio: 'Passionate with AI and any new technologies',
   });
 
   const [settings, setSettings] = useState({
