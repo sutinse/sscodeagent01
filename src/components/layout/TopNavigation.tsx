@@ -10,6 +10,7 @@ import {
   Home as HomeIcon,
   Info as InfoIcon,
   Person as PersonIcon,
+  PlayArrow as DemoIcon,
 } from '@mui/icons-material';
 
 const TopNavigation: React.FC = () => {
@@ -25,6 +26,8 @@ const TopNavigation: React.FC = () => {
         return 1;
       case '/user':
         return 2;
+      case '/demo':
+        return 3;
       default:
         return 0;
     }
@@ -40,6 +43,9 @@ const TopNavigation: React.FC = () => {
         break;
       case 2:
         navigate('/user');
+        break;
+      case 3:
+        navigate('/demo');
         break;
     }
   };
@@ -83,6 +89,12 @@ const TopNavigation: React.FC = () => {
             icon={<PersonIcon />}
             iconPosition="start"
             label="User"
+            sx={{ mr: 1 }}
+          />
+          <Tab
+            icon={<DemoIcon />}
+            iconPosition="start"
+            label="Demo"
             sx={{ mr: 1 }}
           />
         </Tabs>
