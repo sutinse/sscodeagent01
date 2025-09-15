@@ -5,6 +5,7 @@ import Layout from './components/layout/Layout';
 import Home from './pages/Home';
 import About from './pages/About';
 import User from './pages/User';
+import Demo from './pages/Demo';
 import theme from './theme';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
             <Route index element={<Home />} />
             <Route path="about" element={<About />} />
             <Route path="user" element={<User />} />
+            <Route path="demo" element={<Demo />} />
           </Route>
         </Routes>
       </Router>
