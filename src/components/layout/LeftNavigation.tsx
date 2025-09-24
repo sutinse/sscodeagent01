@@ -18,6 +18,7 @@ import {
   Person as PersonIcon,
   Dashboard as DashboardIcon,
   Settings as SettingsIcon,
+  PlayArrow as DemoIcon,
 } from '@mui/icons-material';
 
 const DRAWER_WIDTH = 240;
@@ -37,6 +38,7 @@ const LeftNavigation: React.FC<LeftNavigationProps> = ({ open, onClose, variant 
     { text: 'Home', icon: <HomeIcon />, path: '/' },
     { text: 'About', icon: <InfoIcon />, path: '/about' },
     { text: 'User', icon: <PersonIcon />, path: '/user' },
+    { text: 'Demo', icon: <DemoIcon />, path: '/demo' },
   ];
 
   const utilityItems = [
